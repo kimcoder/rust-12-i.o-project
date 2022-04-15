@@ -3,20 +3,27 @@ use std::{env, fs};
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let (query, filename)= parse_config(&args);
+    let config = Config::new(&args);
 
-    println!("검색어: {}", query);
-    println!("대상파일ㄹ: {}", filename);
+    println!("검색어: {}", config.query);
+    println!("대상파일ㄹ: {}", config.filename);
 
-    let contents = fs::read_to_string(filename)
+    let contents = fs::read_to_string(config.filename)
         .expect("파일을 읽지 못했습니다.");
 
     println!("파일 내용:\n{}", contents)
 }
 
-fn parse_config(args: &[String]) -> (&str, &str) {
-    let query = &args[1];
-    let filename = &args[2];
+struct Config {
+    query: String,
+    filename: String
+}
 
-    (query, filename)
+impl Config {
+    fn new(args: &[String]) -> Config {
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Config { query, filename }
+    }
 }
