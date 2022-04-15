@@ -1,0 +1,6 @@
+Squat
+Bench Press
+DeadLift
+Overhead Shoulder Press
+Military Press
+
