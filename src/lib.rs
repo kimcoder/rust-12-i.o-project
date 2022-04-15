@@ -1,8 +1,9 @@
-use std::{fs, error::Error, io::Read};
+use std::{fs, error::Error, io::Read, env};
 
 pub struct Config {
     pub query: String,
-    pub filename: String
+    pub filename: String,
+    pub case_sensitive: bool,
 }
 
 impl Config {
@@ -12,8 +13,11 @@ impl Config {
         }
         let query = args[1].clone();
         let filename = args[2].clone();
+        let case_sensitive = env::var("CASE_SENSITIVE").is_err();
+        println!("CASE_SENSITIVE {}", case_sensitive);
 
-        Ok(Config { query, filename })
+
+        Ok(Config { query, filename, case_sensitive })
     }
 }
 
@@ -35,7 +39,7 @@ mod test {
   use super::*;
 
   #[test]
-  fn one_result() {
+  fn case_sensitive() {
     let query = "Squat";
     let content = "\
 Squat
@@ -44,6 +48,17 @@ rust";
 
     assert_eq!(vec!["Squat"], search(query, content));
   }
+
+  #[test]
+  fn case_insensitive() {
+    let query = "Squat";
+    let content = "\
+Squat
+TEST
+rust";
+
+    assert_eq!(vec!["Squat"], search_case_case_insensitive(query, content));
+  }
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
@@ -51,6 +66,19 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
 
   for line in contents.lines() {
     if line.contains(query) {
+      results.push(line);
+    }
+  }
+
+  results
+}
+
+pub fn search_case_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
+  let query = query.to_lowercase();
+  let mut results = Vec::new();
+
+  for line in contents.lines() {
+    if line.to_lowercase().contains(&query) {
       results.push(line);
     }
   }
