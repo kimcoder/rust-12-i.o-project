@@ -24,3 +24,23 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn one_result() {
+    let query = "duct";
+    let content = "\
+Squat
+TEST
+rust";
+
+    assert_eq!(vec!["Squat, TEST"], search(query, content));
+  }
+}
+
+pub fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str>{
+  vec![]
+}
