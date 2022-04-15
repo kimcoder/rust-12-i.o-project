@@ -1,4 +1,6 @@
 
+mod lib;
+
 use std::{env, process};
 
 use minigrep::Config;

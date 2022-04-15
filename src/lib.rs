@@ -1,4 +1,4 @@
-use std::{fs, error::Error};
+use std::{fs, error::Error, io::Read};
 
 pub struct Config {
     pub query: String,
@@ -18,9 +18,14 @@ impl Config {
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.filename)?;
+    let mut f = fs::File::open(config.filename)?;
 
-    println!("파일 내용\n{}", contents);
+    let mut contents = String::new();
+    f.read_to_string(&mut contents)?;
+
+    for line in search(&config.query, &contents) {
+      println!("{}", line);
+    }
 
     Ok(())
 }
@@ -31,16 +36,24 @@ mod test {
 
   #[test]
   fn one_result() {
-    let query = "duct";
+    let query = "Squat";
     let content = "\
 Squat
 TEST
 rust";
 
-    assert_eq!(vec!["Squat, TEST"], search(query, content));
+    assert_eq!(vec!["Squat"], search(query, content));
   }
 }
 
-pub fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str>{
-  vec![]
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>{
+  let mut results = Vec::new();
+
+  for line in contents.lines() {
+    if line.contains(query) {
+      results.push(line);
+    }
+  }
+
+  results
 }
